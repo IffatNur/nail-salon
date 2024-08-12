@@ -2,6 +2,7 @@ import Mainlayout from "@/layout/Mainlayout";
 import AboutUs from "@/pages/AboutUs";
 import Booking from "@/pages/Booking";
 import Home from "@/pages/Home";
+import Login from "@/pages/Login";
 import OurTeam from "@/pages/OurTeam";
 import Services from "@/pages/Services";
 import Shop from "@/pages/Shop";
@@ -34,6 +35,14 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/shop',
+                element: <Shop></Shop>
+            },
+            {
+                path: '/login',
+                element: <Login></Login>
+            },
+            {
+                path: '/register',
                 element: <Shop></Shop>
             },
         ]

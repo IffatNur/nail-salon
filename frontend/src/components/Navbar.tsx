@@ -31,8 +31,8 @@ const Navbar = () => {
       <div
         className={
           header
-            ? "w-full bg-white fixed py-4 z-50"
-            : "w-full bg-transparent my-5 absolute top-0 z-50"
+            ? "w-full bg-white fixed top-0 py-4 z-50"
+            : "w-full bg-transparent py-5 absolute top-0 z-50 "
         }
       >
         <div className="grid grid-cols-3 justify-between items-center">
@@ -67,6 +67,12 @@ const Navbar = () => {
                   <DropdownMenuItem>
                     <Link to="/services">Services & Prices</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="/login">Login</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="/register">Sign Up</Link>
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -81,10 +87,7 @@ const Navbar = () => {
             </Button>
           </div>
           <div className="mx-auto">
-            <img
-              className="h-10"
-              src="https://i.ibb.co/6JHYzWD/Logo-dark-mobile.png"
-            />
+            <h1 className="font-libre text-3xl">LEONIE</h1>
           </div>
           <div className="mx-auto flex justify-center items-center">
             <Button variant="ghost">

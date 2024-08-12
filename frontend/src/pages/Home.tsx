@@ -1,12 +1,14 @@
-import Appointment from "@/components/Sections/Appointment";
-import BestSeller from "@/components/Sections/BestSeller";
-import Collection from "@/components/Sections/Collection";
-import Contact from "@/components/Sections/Contact";
-import HeroSection from "@/components/Sections/HeroSection";
-import Manicure from "@/components/Sections/Manicure";
-import Social from "@/components/Sections/Social";
-import Treatments from "@/components/Sections/Treatments";
-import Trends from "@/components/Sections/Trends";
+import Footer from "@/components/Footer";
+import Appointment from "@/components/Sections/Home/Appointment";
+import BestSeller from "@/components/Sections/Home/BestSeller";
+import Collection from "@/components/Sections/Home/Collection";
+import Contact from "@/components/Sections/Home/Contact";
+import ContactSalon from "@/components/Sections/Home/ContactSalon";
+import HeroSection from "@/components/Sections/Home/HeroSection";
+import Manicure from "@/components/Sections/Home/Manicure";
+import Social from "@/components/Sections/Home/Social";
+import Treatments from "@/components/Sections/Home/Treatments";
+import Trends from "@/components/Sections/Home/Trends";
 
 const Home = () => {
   return (
@@ -20,6 +22,8 @@ const Home = () => {
       <Collection></Collection>
       <Treatments></Treatments>
       <Social></Social>
+      <ContactSalon></ContactSalon>
+      <Footer></Footer>
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import Container from "../ui/Container";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import Container from "../../ui/Container";
+import { Button } from "../../ui/button";
+import { Input } from "../../ui/input";
 
 const Appointment = () => {
   return (

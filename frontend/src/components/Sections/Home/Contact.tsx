@@ -1,5 +1,5 @@
-import Container from "../ui/Container";
-import { Button } from "../ui/button";
+import Container from "../../ui/Container";
+import { Button } from "../../ui/button";
 
 const Contact = () => {
   return (

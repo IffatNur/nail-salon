@@ -1,0 +1,103 @@
+[{"id":1,"service_category":"Pedicure","service_name":["Harbal Pedicure", "Fruit Pedicure", "Normal Pedicure", "Jelly Pedicure"],"cost":"$30","time":[
+  "10:00AM - 10:30AM",
+  "10:30AM - 11:00AM",
+  "11:00AM - 11:30AM",
+  "11:30AM - 12:00PM",
+  "12:00PM - 12:30PM",
+  "12:30PM - 01:00AM",
+  "01:00PM - 01:30PM",
+  "01:30PM - 02:00PM",
+  "02:00PM - 02:30PM",
+  "03:00PM - 03:30PM"
+]},
+{
+  "id": 2,
+  "service_category": "Manicure",
+  "service_name": [
+    "Harbal Manicure",
+    "Fruit Manicure",
+    "Normal Manicure",
+    "Jelly Manicure"
+  ],
+  "cost": "$45",
+  "time": [
+    "10:00AM - 10:30AM",
+    "10:30AM - 11:00AM",
+    "11:00AM - 11:30AM",
+    "11:30AM - 12:00PM",
+    "12:00PM - 12:30PM",
+    "12:30PM - 01:00AM",
+    "01:00PM - 01:30PM",
+    "01:30PM - 02:00PM",
+    "02:00PM - 02:30PM",
+    "03:00PM - 03:30PM"
+  ]
+},
+{
+  "id": 3,
+  "service_category": "Haircut",
+  "service_name": [
+    "Short Layer",
+    "Long Layer",
+    "Shaggy",
+    "U-Cut",
+    "V-cut",
+    "Baby Haircut"
+  ],
+  "cost": "$20",
+  "time": [
+    "10:00AM - 10:30AM",
+    "10:30AM - 11:00AM",
+    "11:00AM - 11:30AM",
+    "11:30AM - 12:00PM",
+    "12:00PM - 12:30PM",
+    "12:30PM - 01:00AM",
+    "01:00PM - 01:30PM",
+    "01:30PM - 02:00PM",
+    "02:00PM - 02:30PM",
+    "03:00PM - 03:30PM"
+  ]
+},
+{
+  "id": 4,
+  "service_category": "Makeover",
+  "service_name": ["Bridal makeover", "Party makeover"],
+  "cost": "$150",
+  "time": [
+    "10:00AM - 11:00AM",
+    "11:00AM - 12:00PM",
+    "01:00PM - 02:00PM",
+    "03:00PM - 04:00PM",
+    "05:00PM - 06:00PM"
+  ]
+},
+{
+  "id": 5,
+  "service_category": "Facial",
+  "service_name": [
+    "Face clean",
+    "Hydra Facial",
+    "Gold Facial",
+    "Chocolate Facial"
+  ],
+  "cost": "$50",
+  "time": [
+    "10:00AM - 10:30AM",
+    "10:30AM - 11:00AM",
+    "11:00AM - 11:30AM",
+    "11:30AM - 12:00PM",
+    "12:00PM - 12:30PM",
+    "12:30PM - 01:00AM",
+    "01:00PM - 01:30PM",
+    "01:30PM - 02:00PM",
+    "02:00PM - 02:30PM",
+    "03:00PM - 03:30PM"
+  ]
+},
+{"id":6,"service_category":"Combo","service_name":["Harbal Manicure & Pedicure", "Fruit Manicure & Pedicure", "Normal Manicure & Pedicure", "Jelly Manicure & Pedicure"],"time":[
+  "10:00AM - 11:00AM",
+  "11:00AM - 12:00PM",
+  "01:00PM - 02:00PM",
+  "03:00PM - 04:00PM",
+  "05:00PM - 06:00PM"
+]}]
