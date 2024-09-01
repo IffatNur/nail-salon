@@ -2,18 +2,22 @@
   "name": "nail-salon",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start:backend": "nodemon index.ts",
     "start:frontend": "npm run dev",
-    "start:backend": "nodemon index.js",
-    "dev": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
-
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tanstack/react-query": "^5.53.1",
+    "axios": "^1.7.6",
     "nail-salon": "^0.2.12"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

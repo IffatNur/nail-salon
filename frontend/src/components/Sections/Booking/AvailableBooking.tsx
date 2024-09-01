@@ -6,9 +6,9 @@ import BookingOption from "./BookingOption";
 const AvailableBooking = ({ selected }) => {
   const [bookingOptions, setBookingOptions] = useState([]);
   useEffect(()=>{
-    fetch('services.json')
-    .then(res => res.json())
-    .then(data=> setBookingOptions(data))
+    fetch("http://localhost:5001/services")
+      .then((res) => res.json())
+      .then((data) => setBookingOptions(data));
   },[])
   return (
     <Container className="bg-transparent w-full">

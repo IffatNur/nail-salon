@@ -3,10 +3,22 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AuthContext } from "@/contexts/AuthProvider";
 import { format } from "date-fns";
+import { useContext } from "react";
+import {useLocation, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+import useAxios from "@/hooks/useAxios";
+import useAppointment from "@/hooks/useAppointment";
 
 const BookingModal = ({ service, selected,setOpen  }) => {
   const { service_category, service_name, time,cost } = service;
+  const {user} = useContext(AuthContext)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosSecure = useAxios()
+  const [, refetch] = useAppointment()
   const handleSubmit  = event =>{
     event.preventDefault();
     const name = event.target.name.value;
@@ -14,17 +26,45 @@ const BookingModal = ({ service, selected,setOpen  }) => {
     const address = event.target.address.value;
     const service = event.target.service.value;
     const time = event.target.time.value;
-    const userDetails = {
+    const appointmentDetails = {
         appointmentTime: format(selected,'PP'),
         clientName:name,
         email,
         address,
+        serviceCategory: service_category,
         serviceName: service,
         time
     }
-    console.log(userDetails);
+    axiosSecure.post("/appointments", appointmentDetails)
+    .then(data => {
+      console.log(data.data);
+      if (data.data.insertedId){
+        toast.success("Booked an Appointment");
+        refetch()
+      } 
+    })
+    .catch(err => {
+      console.log(err);
+      toast.error(err.message)
+    });
+    
+    if(!user){
+      Swal.fire({
+        title: "Want to book an Appointment?",
+        text: "Please login to book an appointment",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+            navigate('/login', {state: {from: location}} )
+          }
+        });
+      }
+      setOpen(false);
   }
-
   return (
     <div>
       {/* <DialogTrigger asChild>
@@ -105,6 +145,8 @@ const BookingModal = ({ service, selected,setOpen  }) => {
             id="email"
             className="bg-gray-200 text-gray-900 font-bold"
             placeholder="Your email"
+            value={user?.email}
+            disabled
           ></Input>
         </div>
         <div>
@@ -118,7 +160,6 @@ const BookingModal = ({ service, selected,setOpen  }) => {
         <Button
           className="w-full bg-gradient-to-r from-purple-700 via-rose-600 to-purple-700 mt-5"
           type="submit"
-          onClick={() => setOpen(false )}
         >
           Submit
         </Button>
