@@ -1,9 +1,17 @@
+import useAdmin from "@/hooks/useAdmin";
 
 const Dashboard = () => {
+    const [isAdmin] = useAdmin()
+    // console.log(isAdmin);
     return (
-        <div>
-            Dashboard
-        </div>
+      <div>
+        {
+          isAdmin === true ?
+          <><div>Admin</div></> 
+          :
+          <><div>Not Admin</div></>
+        }
+      </div>
     );
 };
 

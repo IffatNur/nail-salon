@@ -3,7 +3,8 @@ import Container from "@/components/ui/Container";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { AuthContext } from "@/contexts/AuthProvider";
-import { useAuth0 } from "@auth0/auth0-react";
+import useAxiosPublic from "@/hooks/useAxiosPublic";
+import { UserCredential } from "firebase/auth";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -12,6 +13,9 @@ type TInput = {
     name: string,
     email: string,
     password: string,
+}
+type TResult = {
+  result : UserCredential | null
 }
 const Signup = () => {
   // const{ loginWithRedirect,user } = useAuth0()
@@ -22,7 +26,8 @@ const Signup = () => {
       reset,
     } = useForm<TInput>();
     const navigate = useNavigate();
-    const { Signup, UpdateUserProfile } = useContext(AuthContext);
+    const { Signup, UpdateUserProfile, GoogleSignIn } = useContext(AuthContext);
+    const axiosPublic = useAxiosPublic()
     const handleOnSubmit = (data: TInput) => {
       const name = data.name;
       const email = data.email;
@@ -35,20 +40,33 @@ const Signup = () => {
       // if(user?.nickname){
       //   user.nickname = name;
       // }
+      const userInfo = {name,email}
       Signup({email, password})
       .then((user) =>{
         console.log(user)
         UpdateUserProfile(name)
         .then(()=>{
           console.log('updated profile');
+          axiosPublic.post('/users', userInfo)
+          .then(res => {
+            console.log(res);
+          })
+          navigate('/')
           toast.success('Profile Created Successfully')
+          reset();
         })
         .catch(err=>console.log(err))
         })
       .catch(err => console.log(err))
-      reset();
     };
-    // console.log(user);
+    const handleGoogleSignin = () =>{
+      GoogleSignIn()
+      .then((result: TResult) =>{
+        console.log(result.user);
+        navigate('/');
+      })
+      .catch((err: Error) => console.log(err.message));
+    }
     return (
       <Container className="flex items-center justify-center h-screen w-full my-0 ">
         <div className="shadow-xl p-10 rounded-lg bg-rose-100">
@@ -114,7 +132,7 @@ const Signup = () => {
                 <span>OR</span>
                 <Separator className="my-5 bg-black w-2/5" />
               </div>
-              <Button className="w-full bg-gradient-to-r from-purple-500 via-rose-400 to-purple-500">
+              <Button onClick={() => handleGoogleSignin()} className="w-full bg-gradient-to-r from-purple-500 via-rose-400 to-purple-500">
                 Google Signup
               </Button>
             </div>

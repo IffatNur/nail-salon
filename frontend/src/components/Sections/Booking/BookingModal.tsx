@@ -33,6 +33,7 @@ const BookingModal = ({ service, selected,setOpen  }) => {
         address,
         serviceCategory: service_category,
         serviceName: service,
+        cost,
         time
     }
     axiosSecure.post("/appointments", appointmentDetails)

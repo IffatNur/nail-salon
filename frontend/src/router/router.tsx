@@ -11,6 +11,11 @@ import { createBrowserRouter } from "react-router-dom";
 import Blog from "@/pages/Blog";
 import Dashboard from "@/pages/Dashboard";
 import PrivateRoute from "./PrivateRoute";
+import DashboardLayout from "@/layout/DashboardLayout";
+import MyAppointments from "@/pages/MyAppointments";
+import AllUsers from "@/pages/AllUsers";
+import AdminRoute from "./AdminRoute";
+import AddService from "@/pages/AddService";
 
 export const router = createBrowserRouter([
   {
@@ -57,7 +62,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Mainlayout></Mainlayout>,
+    element: <DashboardLayout></DashboardLayout>,
     children: [
       {
         path: "/dashboard",
@@ -65,6 +70,46 @@ export const router = createBrowserRouter([
           <PrivateRoute>
             <Dashboard></Dashboard>{" "}
           </PrivateRoute>
+        ),
+      },
+      {
+        path: "appointment",
+        element: (
+          <PrivateRoute>
+            <MyAppointments></MyAppointments>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "payment",
+        element: (
+          <PrivateRoute>
+            <Dashboard></Dashboard>{" "}
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "addreviews",
+        element: (
+          <PrivateRoute>
+            <Dashboard></Dashboard>{" "}
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "users",
+        element: (
+            <AdminRoute>
+              <AllUsers></AllUsers>
+            </AdminRoute>
+        ),
+      },
+      {
+        path: "addservice",
+        element: (
+             <AdminRoute> 
+              <AddService></AddService>
+            </AdminRoute>
         ),
       },
     ],

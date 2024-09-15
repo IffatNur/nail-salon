@@ -1,7 +1,8 @@
 
 import { createContext, ReactNode, useEffect, useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 import app from '@/firebase/firebase.init';
+import useAxiosPublic from '@/hooks/useAxiosPublic';
 
 export const AuthContext = createContext({});
  const auth = getAuth(app);
@@ -17,6 +18,8 @@ type TInput = {
 const AuthProvider = ({children} : TChildren) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const axiosPublic = useAxiosPublic();
+    const GoogleProvider = new GoogleAuthProvider();
 
     const Signup = ({email, password}:TInput) =>{
         setLoading(true)
@@ -28,34 +31,49 @@ const AuthProvider = ({children} : TChildren) => {
         return signInWithEmailAndPassword(auth,email, password);
     }
 
+    const GoogleSignIn = () =>{
+        return signInWithPopup(auth, GoogleProvider);
+    }
+
     const SignOut = () =>{
         setLoading(true);
         return (signOut(auth)
-                .then(()=>{})
+                .then(()=>{
+                  localStorage.removeItem('nailsalon-token')
+                })
                 .catch(err => console.log(err)))
     }
 
-    const UpdateUserProfile = (name) =>{
+    const UpdateUserProfile = (name: string) =>{
         return updateProfile(auth.currentUser, {
             displayName: name
         })
     }
 
-    useEffect(()=> {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) =>{
-            setUser(currentUser)
-            console.log(currentUser);
-            setLoading(false)
-        })
-        return () => {
-            return unsubscribe();
-        } 
-    } ,[])
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        setUser(currentUser);
+        console.log(currentUser);
+        if (currentUser?.email)  {
+          const userInfo = { email: currentUser.email };
+          axiosPublic.post("/jwt", userInfo).then((res) => {
+            if (res.data.token) {
+              localStorage.setItem("nailsalon-token", res.data.token);
+            }
+          });
+        }
+        setLoading(false);
+      });
+      return () => {
+        return unsubscribe();
+      };
+    }, [axiosPublic]);
     const authInfo = {
       user,
       loading,
       Signup,
       SignIn,
+      GoogleSignIn,
       SignOut,
       UpdateUserProfile,
     };

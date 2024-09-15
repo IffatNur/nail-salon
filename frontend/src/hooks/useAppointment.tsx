@@ -3,6 +3,8 @@ import useAxios from "./useAxios";
 import { useContext } from "react";
 import { AuthContext } from "@/contexts/AuthProvider";
 
+// to get all appointments by email 
+
 const useAppointment = () => {
     const axiosSecure = useAxios()
     const {user} = useContext(AuthContext)

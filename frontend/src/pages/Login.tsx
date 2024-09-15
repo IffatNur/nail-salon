@@ -14,7 +14,7 @@ const Login = () => {
   // const {loginWithRedirect, user} = useAuth0()
   const navigate = useNavigate();
   const location  = useLocation();
-  const {SignIn} = useContext(AuthContext)
+  const {SignIn,user} = useContext(AuthContext)
   const from = location?.state?.from?.pathname || '/'
   const {register,handleSubmit, formState: {errors}, reset} = useForm<TInput>()
   
@@ -24,7 +24,6 @@ const Login = () => {
     const password = data.password;
     SignIn({email,password})
     .then(result => {
-      console.log(result);
       toast.success('Login Successful')
       navigate(from, { replace: true });
     })
@@ -33,7 +32,6 @@ const Login = () => {
       toast.error('Invalid Login')
 
     })
-    console.log(data);
     reset();
   }
   // console.log(user);

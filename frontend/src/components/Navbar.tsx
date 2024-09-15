@@ -148,8 +148,8 @@ const Navbar = () => {
             <div>
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant='ghost' className="hover:bg-transparent">
-                      <ShoppingCart />
+                  <Button variant="ghost" className="hover:bg-transparent">
+                    <ShoppingCart />
                   </Button>
                 </SheetTrigger>
                 <SheetContent>
@@ -172,11 +172,11 @@ const Navbar = () => {
           </div>
         </div>
         <div>
-          { user &&
+          {user && (
             <p className="font-libre font-thin text-center text-sm">
               Welcome, {user?.displayName}
             </p>
-          }
+          )}
         </div>
       </div>
     );
