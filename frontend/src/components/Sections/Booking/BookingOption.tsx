@@ -7,14 +7,18 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 const BookingOption = ({ details, selected }) => {
   const [open, setOpen] = useState(false);
   const [service, setService] = useState(null);
-  const { id, service_category, service_name, time } = details;
+  const { id, service_category, service_name, time, image } = details;
   return (
     <div>
       <Card className="shadow-xl text-center">
         <CardHeader>
-          <CardTitle>{service_category}</CardTitle>
           <CardDescription>
-            Deploy your new project in one-click.
+            <div className="w-full h-3/4 relative">
+                <CardTitle className="px-10 py-4 mx-auto absolute top-6 bg-rose-200 bg-opacity-50 text-rose-700">
+                  {service_category}
+                </CardTitle>
+              <img className="w-full h-[350px]" src={image} alt="" />
+            </div>
           </CardDescription>
         </CardHeader>
         <CardContent>

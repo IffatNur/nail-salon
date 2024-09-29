@@ -95,11 +95,48 @@ async function run() {
       res.send({isAdmin})
     });
 
+     app.get("/services", async (req, res) => {
+       const result = await servicesCollection.find().toArray();
+       res.send(result);
+     });
+
+     app.get('/services/:id', async(req,res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await servicesCollection.findOne(query);
+      res.send(result)
+     })
+
     app.post('/addservice', verifyToken, verifyAdmin, async(req,res) =>{
       const service = req.body;
       const result = await servicesCollection.insertOne(service);
       res.send(result)
     })
+
+    app.delete('/service/:id',verifyToken, verifyAdmin, async(req,res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await servicesCollection.deleteOne(query);
+      res.send(result)
+    })
+
+    // PENDING UPDATE SERVICE
+
+    // app.patch('/service/:id',verifyToken,verifyAdmin, async(req,res) =>{
+    //   const update = req.body;
+    //   const id = req.params.id;
+    //   console.log(id,update);
+    //   const filter = {_id: new ObjectId(id)};
+    //   const updateDoc = {
+    //     $set: {
+    //       service_category: update.service_category,
+    //       cost: update.cost,
+    //       image: update.image,
+    //     },
+    //   };
+    //   const result = await servicesCollection.updateOne(filter, updateDoc);
+    //   res.send(result)
+    // })
     
     app.get('/users',verifyToken,verifyAdmin, async(req : Request ,res: Response) =>{
       const result = await userCollection.find().toArray();
@@ -135,11 +172,6 @@ async function run() {
       }
       const result = await userCollection.insertOne(user);
       res.send(result)
-    })
-
-    app.get('/services' , async(req,res) =>{
-        const result = await servicesCollection.find().toArray();
-        res.send(result)
     })
 
     app.get('/reviews', async(req,res) =>{

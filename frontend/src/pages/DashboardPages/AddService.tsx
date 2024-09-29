@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import generateTimeRange from "@/hooks/generateTimeRange";
 import useAxios from "@/hooks/useAxios";
+import useAxiosPublic from "@/hooks/useAxiosPublic";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 type TForm = {
   service_name: string,
@@ -22,28 +24,46 @@ const time = [
     '14:00',
     '15:00',
 ]
-
-
+const image_hosting_url = `https://api.imgbb.com/1/upload?key=${
+  import.meta.env.VITE_IMAGE_API_KEY
+}`;
 const AddService = () => {
-    const { register, handleSubmit, formState:{errors}
-     } = useForm<TForm>()
+    const { register, handleSubmit, formState:{errors}, reset} = useForm<TForm>()
+     const axiosPublic = useAxiosPublic()
      const axiosSecure = useAxios()
-     const onSubmit = (data) =>{
+     const onSubmit = async(data) =>{
         const time = generateTimeRange(data.startTime, data.endTime)
-        console.log(time);
-        const serviceDetails = {
-          cost: `$${data.cost}`,
-          service_category: data.service_category,
-          service_name: [data.service_name],
-          image: data.image,
-          time,
-        };
-        axiosSecure.post('/addservice', serviceDetails)
-        .then((res) => console.log(res))
-        .catch(err => console.log(err))
+        
+        const imageFile = {image: data.image[0]}
+        const res = await axiosPublic.post(image_hosting_url, imageFile,{
+          headers:{
+            'content-type': 'multipart/form-data'
+          }
+        })
+        console.log(res.data);
+        if(res.data.success){
+          const serviceDetails = {
+            cost: `$${data.cost}`,
+            service_category: data.service_category,
+            service_name: [data.service_name],
+            image: res.data.data.display_url,
+            time,
+          };
+          axiosSecure.post("/addservice", serviceDetails)
+          .then(res => {
+            if(res.data.insertedId){
+              toast.success('New service added')
+            }
+          })
+          .catch(err => console.log(err));
+        }
+        reset()
      }
     return (
       <Container>
+        <div className="text-center my-10">
+          <h1 className="font-libre text-rose-300">---Add Service ---</h1>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           <div>
             <Label htmlFor="service_name">Service Name</Label>
@@ -69,7 +89,12 @@ const AddService = () => {
           </div>
           <div>
             <Label htmlFor="image">Service Image</Label>
-            <Input className="bg-rose-200" type="file" {...register("image")} placeholder="Image URL" />
+            <Input
+              className="bg-rose-200"
+              type="file"
+              {...register("image")}
+              placeholder="Image URL"
+            />
           </div>
           <div>
             <Label htmlFor="cost">Cost</Label>

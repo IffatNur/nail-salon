@@ -56,7 +56,7 @@ const MyAppointments = () => {
       </div>
       <Table className=" border-rose-100 border-2">
         <TableHeader>
-          <TableRow className="bg-rose-100 ">
+          <TableRow className="bg-rose-100">
             <TableHead className="w-[100px]">Serial no.</TableHead>
             <TableHead>Cateogry</TableHead>
             <TableHead>Service Name</TableHead>
@@ -104,9 +104,9 @@ const MyAppointments = () => {
             <TableCell>${totalCost}</TableCell>
             <TableCell colSpan={2} className="text-right">
               {totalCost === 0 ? (
-                  <Button className="bg-gray-600 hover:bg-transparent" disabled>
-                    Proceed to Pay
-                  </Button>
+                <Button className="bg-gray-600 hover:bg-transparent" disabled>
+                  Proceed to Pay
+                </Button>
               ) : (
                 <Link to="">
                   <Button className="bg-rose-100 hover:bg-transparent text-rose-600 hover:bg-rose-600 hover:text-rose-100 rounded-sm border-2 border-rose-600">

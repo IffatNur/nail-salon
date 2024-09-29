@@ -16,7 +16,7 @@ const generateTimeRange = (startTime: string,endTime: string) => {
       // Add 1 hour
       start.setHours(start.getHours() + 1);
     }
-    console.log(timeArray);
+    // console.log(timeArray);
     return timeArray;
 };
 
