@@ -43,7 +43,7 @@ const AddService = () => {
         console.log(res.data);
         if(res.data.success){
           const serviceDetails = {
-            cost: `$${data.cost}`,
+            cost: data.cost,
             service_category: data.service_category,
             service_name: [data.service_name],
             image: res.data.data.display_url,

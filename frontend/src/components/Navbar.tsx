@@ -15,14 +15,15 @@ import { AuthContext } from "@/contexts/AuthProvider";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import SheetElements from "./SheetElements";
 import useAppointment from "@/hooks/useAppointment";
+import useAdmin from "@/hooks/useAdmin";
+import useAxios from "@/hooks/useAxios";
 
 const Navbar = () => {
-  // const {logout, isAuthenticated,user} = useAuth0(); #Auth0
   const { SignOut, user } = useContext(AuthContext);
+  const [isAdmin] = useAdmin()
   const navigate = useNavigate()
   const [appointment] = useAppointment()
-  const handleSignout = () =>{
-    // logout(); #Auth0
+  const handleSignout: any = () =>{
     SignOut()
     navigate("/login");
   }
@@ -83,9 +84,17 @@ const Navbar = () => {
                   <Link to="/services">
                     <DropdownMenuItem>Services & Prices</DropdownMenuItem>
                   </Link>
-                  <Link to="/dashboard">
-                    <DropdownMenuItem>Dashboard</DropdownMenuItem>
-                  </Link>
+                  {user && isAdmin && (
+                    <Link to="/dashboard/admindashboard">
+                      <DropdownMenuItem>Admin Dashboard</DropdownMenuItem>
+                    </Link>
+                  )}
+                  {user && !isAdmin && (
+                    <Link to="/dashboard/userdashboard">
+                      <DropdownMenuItem>User Dashboard</DropdownMenuItem>
+                    </Link>
+                  )}
+
                   <Link to="/login">
                     <DropdownMenuItem>Login</DropdownMenuItem>
                   </Link>

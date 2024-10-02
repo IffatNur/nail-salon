@@ -20,7 +20,7 @@ const MyAppointments = () => {
     const axios = useAxios()
 
     const totalCost = appointment.reduce(
-      (total, appoint) => total + Number(appoint.cost.split("$")[1]),
+      (total, appoint) => total + appoint.cost,
       0
     );
     const handleDelete = (id: string) =>{
@@ -47,7 +47,6 @@ const MyAppointments = () => {
             })
           }
         });
-        
     }
   return (
     <div className="w-full mx-auto px-10">
@@ -104,11 +103,11 @@ const MyAppointments = () => {
             <TableCell>${totalCost}</TableCell>
             <TableCell colSpan={2} className="text-right">
               {totalCost === 0 ? (
-                <Button className="bg-gray-600 hover:bg-transparent" disabled>
-                  Proceed to Pay
-                </Button>
+                  <Button className="bg-gray-600 hover:bg-transparent" disabled>
+                    Proceed to Pay
+                  </Button>
               ) : (
-                <Link to="">
+                <Link to="payment">
                   <Button className="bg-rose-100 hover:bg-transparent text-rose-600 hover:bg-rose-600 hover:text-rose-100 rounded-sm border-2 border-rose-600">
                     Proceed to Pay
                   </Button>

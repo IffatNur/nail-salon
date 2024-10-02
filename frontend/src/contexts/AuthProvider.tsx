@@ -53,16 +53,19 @@ const AuthProvider = ({children} : TChildren) => {
     useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
         setUser(currentUser);
-        console.log(currentUser);
         if (currentUser?.email)  {
-          const userInfo = { email: currentUser.email };
-          axiosPublic.post("/jwt", userInfo).then((res) => {
-            if (res.data.token) {
-              localStorage.setItem("nailsalon-token", res.data.token);
-            }
-          });
+            const userInfo = { email: currentUser.email };
+            axiosPublic.post("/jwt", userInfo).then((res) => {
+              if (res.data.token) {
+                localStorage.setItem("nailsalon-token", res.data.token);
+                setLoading(false);
+              }else{
+                localStorage.removeItem("nailsalon-token");
+                setLoading(false)
+              }
+            });
         }
-        setLoading(false);
+        
       });
       return () => {
         return unsubscribe();

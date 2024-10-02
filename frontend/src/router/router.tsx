@@ -9,15 +9,19 @@ import Shop from "@/pages/Shop";
 import Signup from "@/pages/Signup";
 import { createBrowserRouter } from "react-router-dom";
 import Blog from "@/pages/Blog";
-import Dashboard from "@/pages/DashboardPages/Dashboard";
 import PrivateRoute from "./PrivateRoute";
 import DashboardLayout from "@/layout/DashboardLayout";
-import MyAppointments from "@/pages/DashboardPages/MyAppointments";
-import AllUsers from "@/pages/AllUsers";
 import AdminRoute from "./AdminRoute";
-import AddService from "@/pages/DashboardPages/AddService";
-import ManageServices from "@/pages/DashboardPages/ManageServices";
-import UpdateService from "@/pages/DashboardPages/UpdateService";
+import AddService from "@/pages/DashboardPages/Admin/AddService";
+import ManageServices from "@/pages/DashboardPages/Admin/ManageServices";
+import UpdateService from "@/pages/DashboardPages/Admin/UpdateService";
+import MyAppointments from "@/pages/DashboardPages/User/MyAppointments";
+import AllUsers from "@/pages/DashboardPages/Admin/AllUsers";
+import Payment from "@/pages/DashboardPages/Payment/Payment";
+import Dashboard from "@/pages/DashboardPages/Dashboard";
+import PaymentHistory from "@/pages/DashboardPages/User/PaymentHistory";
+import UserDashboard from "@/pages/DashboardPages/User/UserDashboard";
+import AdminDashboard from "@/pages/DashboardPages/Admin/AdminDashboard";
 
 export const router = createBrowserRouter([
   {
@@ -64,13 +68,37 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <DashboardLayout></DashboardLayout>,
+    element: (
+      <PrivateRoute>
+        <DashboardLayout></DashboardLayout>
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: "/dashboard",
+        path: "userdashboard",
+        element: <UserDashboard></UserDashboard>,
+      },
+      {
+        path: "admindashboard",
+        element: (
+          <AdminRoute>
+            <AdminDashboard></AdminDashboard>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "appointment/payment",
         element: (
           <PrivateRoute>
-            <Dashboard></Dashboard>{" "}
+            <Payment></Payment>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "payment-history",
+        element: (
+          <PrivateRoute>
+            <PaymentHistory></PaymentHistory>
           </PrivateRoute>
         ),
       },
@@ -82,22 +110,14 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      {
-        path: "payment",
-        element: (
-          <PrivateRoute>
-            <Dashboard></Dashboard>{" "}
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "addreviews",
-        element: (
-          <PrivateRoute>
-            <Dashboard></Dashboard>{" "}
-          </PrivateRoute>
-        ),
-      },
+      // {
+      //   path: "addreviews",
+      //   element: (
+      //     <PrivateRoute>
+      //       <Dashboard></Dashboard>{" "}
+      //     </PrivateRoute>
+      //   ),
+      // },
       {
         path: "users",
         element: (
@@ -129,7 +149,8 @@ export const router = createBrowserRouter([
             <UpdateService></UpdateService>
           </AdminRoute>
         ),
-        loader: async ({params}) => fetch(`http://localhost:5002/services/${params.id}`),
+        loader: async ({ params }) =>
+          fetch(`http://localhost:5002/services/${params.id}`),
       },
       // {
       //   path: "manageappointments",

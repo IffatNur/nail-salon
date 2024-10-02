@@ -12,6 +12,7 @@ const PrivateRoute = ({children}) => {
     if(user) {
         return children
     }
+    console.log('found no user');
     return <Navigate to="/login" state={{ from: location }} replace />;
 };
 

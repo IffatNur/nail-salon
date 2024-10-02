@@ -5,7 +5,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import useAxios from "@/hooks/useAxios";
 import { useQuery } from "@tanstack/react-query";
 import { CircleUserRound, Trash2, Users } from "lucide-react";
-import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const AllUsers = () => {

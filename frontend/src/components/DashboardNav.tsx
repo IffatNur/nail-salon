@@ -15,10 +15,12 @@ import {
   Users,
 } from "lucide-react";
 import useAdmin from "@/hooks/useAdmin";
+import useAppointment from "@/hooks/useAppointment";
 
 
 const DashboardNav = () => {
-  const [isAdmin] = useAdmin()
+  const [isAdmin] = useAdmin();
+  const [appointment] = useAppointment()
     return (
       <div className="w-full bg-gradient-to-br from-purple-200 to-rose-200 h-screen">
         <div className="w-full text-center py-10">
@@ -30,7 +32,7 @@ const DashboardNav = () => {
         <div className="px-6 pb-4">
           {isAdmin === true ? (
             <>
-              <Link to="/dashboard">
+              <Link to="/dashboard/admindashboard">
                 <Button className="w-full bg-transparent hover:bg-rose-50 text-black font-libre flex gap-2 justify-start items-center">
                   <span>
                     <HomeIcon />
@@ -73,7 +75,7 @@ const DashboardNav = () => {
             </>
           ) : (
             <>
-              <Link to="/dashboard">
+              <Link to="/dashboard/userdashboard">
                 <Button className="w-full bg-transparent hover:bg-rose-50 text-black font-libre flex gap-2 justify-start items-center">
                   <span>
                     <HomeIcon />
@@ -86,10 +88,10 @@ const DashboardNav = () => {
                   <span>
                     <LayoutDashboard />
                   </span>
-                  <span className="text-sm">My Appointment</span>
+                  <span className="text-sm">My Appointments</span>
                 </Button>
               </Link>
-              <Link to="/dashboard/payment">
+              <Link to="/dashboard/payment-history">
                 <Button className="w-full bg-transparent hover:bg-rose-50 text-black font-libre flex gap-2 justify-start items-center">
                   <span>
                     <BadgeDollarSign />

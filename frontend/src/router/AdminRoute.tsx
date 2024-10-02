@@ -16,6 +16,7 @@ const AdminRoute = ({children}) => {
     if(user && isAdmin === true){
         return children
     }
+    console.log('not an admin,check admin route');
     return <Navigate to='/login' state={{from : location}} replace></Navigate>
 };
 

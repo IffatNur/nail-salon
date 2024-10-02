@@ -24,7 +24,7 @@ const Login = () => {
     const password = data.password;
     SignIn({email,password})
     .then(result => {
-      toast.success('Login Successful')
+      toast.success('Welcome back to LEONIE')
       navigate(from, { replace: true });
     })
     .catch(err => {

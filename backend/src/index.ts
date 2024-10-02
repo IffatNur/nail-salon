@@ -8,6 +8,7 @@ const app = express()
 const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5002
 dotenv.config();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // middleware
 app.use(cors())
@@ -34,12 +35,13 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const servicesCollection = client.db('nailSalonDB').collection('services');
     const reviewsCollection = client.db('nailSalonDB').collection('reviews')
     const appointmentCollection = client.db('nailSalonDB').collection('appointments');
-    const userCollection = client.db('nailSalonDB').collection('users')
+    const userCollection = client.db('nailSalonDB').collection('users');
+    const paymentCollection = client.db('nailSalonDB').collection('payment-history');
 
     app.post('/jwt', async(req,res) =>{
       const user = req.body;
@@ -80,6 +82,39 @@ async function run() {
       next()
     }
 
+    app.post("/create-payment-intent", async(req,res) =>{
+      const {cost} = req.body;
+      const amount = parseInt(cost) * 100
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.send({clientSecret: paymentIntent.client_secret})
+    });
+
+    app.post('/payment-history',verifyToken, async(req, res) =>{
+      const paymentDetails = req.body;
+      console.log(paymentDetails);
+      const result = await paymentCollection.insertOne(paymentDetails);
+      const query = {
+        _id: {
+          $in:
+            paymentDetails.appointmentIds.map((id: string) => new ObjectId(id)),
+        },
+      };
+      const deletedAppointments = await appointmentCollection.deleteMany(query)
+      res.send({result,deletedAppointments})
+    })
+
+    app.get("/payment-history/:id",verifyToken, async(req,res) =>{
+      const email = req.params.id;
+      const query = {clientEmail: email};
+      const result = await paymentCollection.find(query).toArray();
+      res.send(result)
+    });
+
     app.get("/users/admin/:email",verifyToken, async (req: Request, res: Response) => {
       const email = req.params.email;
       const decodedEmail = req.decoded?.email;
@@ -91,9 +126,71 @@ async function run() {
       const user = await userCollection.findOne(query);
       if(user?.role === 'admin'){
         isAdmin = true
+      }else{
+        isAdmin = false
       }
       res.send({isAdmin})
     });
+
+    app.get('/admin-stat',verifyToken,verifyAdmin, async(req,res )=>{
+      const users = await userCollection.estimatedDocumentCount()
+      const services = await servicesCollection.estimatedDocumentCount()
+      const appointments = await appointmentCollection.estimatedDocumentCount()
+      const result = await paymentCollection.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalRevenue: {
+              $sum: "$totalCost",
+            },
+          },
+        },
+      ]).toArray();
+      const revenue = result.length > 0 ?result[0].totalRevenue : 0
+      res.send({users,services,appointments, revenue})
+    })
+
+    app.get('/revenue-stats', verifyToken,verifyAdmin, async(req,res) =>{
+      const result = await paymentCollection
+        .aggregate([
+          {
+            $unwind: "$serviceIds", //distruct the serviceIds of payment collection
+          },
+          {
+            $addFields: {
+              serviceIds: { $toObjectId: "$serviceIds" }, // convert the serviceIds of payment collection as ObjectID(id) to match with service table's _id whic is form of ObjectID(id)
+            },
+          },
+          {
+            $lookup: {
+              from: "services", // Lookup the "services" table
+              localField: "serviceIds", // Field from payment_history
+              foreignField: "_id", // Field from services table
+              as: "allServices",
+            },
+          },
+          {
+            $unwind: "$allServices", //to bring the matched ids out of array
+          },
+          {
+            $group: {
+              _id: "$allServices.service_category", //group by service category
+              totalQuantity: { $sum: 1 }, //calculate the qunatity of each category sold/booked
+              totalAmount: { $sum: "$allServices.cost" },
+            },
+          },
+          {
+            $project: {
+              _id: 0, //to discard _id in $group (0 means discard the field)
+              service_category: "$_id", //to rename _id as service_cateogry
+              totalQuantity: 1, //1 means keep the field
+              totalAmount: 1,
+            },
+          },
+        ])
+        .toArray();
+      res.send(result)
+    })
 
      app.get("/services", async (req, res) => {
        const result = await servicesCollection.find().toArray();
@@ -179,7 +276,7 @@ async function run() {
       res.send(result)
     })
 
-    app.get('/appointments', async(req,res) =>{
+    app.get('/appointments',async(req,res) =>{
       const email = req.query.email;
       const query = {email: email}
       const result = await appointmentCollection.find(query).toArray();

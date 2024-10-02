@@ -13,7 +13,7 @@ import useAxios from "@/hooks/useAxios";
 import useAppointment from "@/hooks/useAppointment";
 
 const BookingModal = ({ service, selected,setOpen  }) => {
-  const { service_category, service_name, time,cost } = service;
+  const { _id, service_category, service_name, time,cost } = service;
   const {user} = useContext(AuthContext)
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,6 +27,7 @@ const BookingModal = ({ service, selected,setOpen  }) => {
     const service = event.target.service.value;
     const time = event.target.time.value;
     const appointmentDetails = {
+        serviceId: _id,
         appointmentTime: format(selected,'PP'),
         clientName:name,
         email,
