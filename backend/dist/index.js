@@ -21,6 +21,7 @@ const app = (0, express_1.default)();
 const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5002;
 dotenv_1.default.config();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 // middleware
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -37,11 +38,12 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Connect the client to the server	(optional starting in v4.7)
-            yield client.connect();
+            // await client.connect();
             const servicesCollection = client.db('nailSalonDB').collection('services');
             const reviewsCollection = client.db('nailSalonDB').collection('reviews');
             const appointmentCollection = client.db('nailSalonDB').collection('appointments');
             const userCollection = client.db('nailSalonDB').collection('users');
+            const paymentCollection = client.db('nailSalonDB').collection('payment-history');
             app.post('/jwt', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const user = req.body;
                 const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
@@ -74,6 +76,34 @@ function run() {
                 }
                 next();
             });
+            app.post("/create-payment-intent", (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const { cost } = req.body;
+                const amount = parseInt(cost) * 100;
+                const paymentIntent = yield stripe.paymentIntents.create({
+                    amount: amount,
+                    currency: "usd",
+                    payment_method_types: ["card"],
+                });
+                res.send({ clientSecret: paymentIntent.client_secret });
+            }));
+            app.post('/payment-history', verifyToken, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const paymentDetails = req.body;
+                console.log(paymentDetails);
+                const result = yield paymentCollection.insertOne(paymentDetails);
+                const query = {
+                    _id: {
+                        $in: paymentDetails.appointmentIds.map((id) => new mongodb_1.ObjectId(id)),
+                    },
+                };
+                const deletedAppointments = yield appointmentCollection.deleteMany(query);
+                res.send({ result, deletedAppointments });
+            }));
+            app.get("/payment-history/:id", verifyToken, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const email = req.params.id;
+                const query = { clientEmail: email };
+                const result = yield paymentCollection.find(query).toArray();
+                res.send(result);
+            }));
             app.get("/users/admin/:email", verifyToken, (req, res) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
                 const email = req.params.email;
@@ -87,8 +117,106 @@ function run() {
                 if ((user === null || user === void 0 ? void 0 : user.role) === 'admin') {
                     isAdmin = true;
                 }
+                else {
+                    isAdmin = false;
+                }
                 res.send({ isAdmin });
             }));
+            app.get('/admin-stat', verifyToken, verifyAdmin, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const users = yield userCollection.estimatedDocumentCount();
+                const services = yield servicesCollection.estimatedDocumentCount();
+                const appointments = yield appointmentCollection.estimatedDocumentCount();
+                const result = yield paymentCollection.aggregate([
+                    {
+                        $group: {
+                            _id: null,
+                            totalRevenue: {
+                                $sum: "$totalCost",
+                            },
+                        },
+                    },
+                ]).toArray();
+                const revenue = result.length > 0 ? result[0].totalRevenue : 0;
+                res.send({ users, services, appointments, revenue });
+            }));
+            app.get('/revenue-stats', verifyToken, verifyAdmin, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const result = yield paymentCollection
+                    .aggregate([
+                    {
+                        $unwind: "$serviceIds", //distruct the serviceIds of payment collection
+                    },
+                    {
+                        $addFields: {
+                            serviceIds: { $toObjectId: "$serviceIds" }, // convert the serviceIds of payment collection as ObjectID(id) to match with service table's _id whic is form of ObjectID(id)
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: "services", // Lookup the "services" table
+                            localField: "serviceIds", // Field from payment_history
+                            foreignField: "_id", // Field from services table
+                            as: "allServices",
+                        },
+                    },
+                    {
+                        $unwind: "$allServices", //to bring the matched ids out of array
+                    },
+                    {
+                        $group: {
+                            _id: "$allServices.service_category", //group by service category
+                            totalQuantity: { $sum: 1 }, //calculate the qunatity of each category sold/booked
+                            totalAmount: { $sum: "$allServices.cost" },
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0, //to discard _id in $group (0 means discard the field)
+                            service_category: "$_id", //to rename _id as service_cateogry
+                            totalQuantity: 1, //1 means keep the field
+                            totalAmount: 1,
+                        },
+                    },
+                ])
+                    .toArray();
+                res.send(result);
+            }));
+            app.get("/services", (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const result = yield servicesCollection.find().toArray();
+                res.send(result);
+            }));
+            app.get('/services/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const id = req.params.id;
+                const query = { _id: new mongodb_1.ObjectId(id) };
+                const result = yield servicesCollection.findOne(query);
+                res.send(result);
+            }));
+            app.post('/addservice', verifyToken, verifyAdmin, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const service = req.body;
+                const result = yield servicesCollection.insertOne(service);
+                res.send(result);
+            }));
+            app.delete('/service/:id', verifyToken, verifyAdmin, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const id = req.params.id;
+                const query = { _id: new mongodb_1.ObjectId(id) };
+                const result = yield servicesCollection.deleteOne(query);
+                res.send(result);
+            }));
+            // PENDING UPDATE SERVICE
+            // app.patch('/service/:id',verifyToken,verifyAdmin, async(req,res) =>{
+            //   const update = req.body;
+            //   const id = req.params.id;
+            //   console.log(id,update);
+            //   const filter = {_id: new ObjectId(id)};
+            //   const updateDoc = {
+            //     $set: {
+            //       service_category: update.service_category,
+            //       cost: update.cost,
+            //       image: update.image,
+            //     },
+            //   };
+            //   const result = await servicesCollection.updateOne(filter, updateDoc);
+            //   res.send(result)
+            // })
             app.get('/users', verifyToken, verifyAdmin, (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const result = yield userCollection.find().toArray();
                 res.send(result);
@@ -119,10 +247,6 @@ function run() {
                     return res.send({ message: 'User Already Exists' });
                 }
                 const result = yield userCollection.insertOne(user);
-                res.send(result);
-            }));
-            app.get('/services', (req, res) => __awaiter(this, void 0, void 0, function* () {
-                const result = yield servicesCollection.find().toArray();
                 res.send(result);
             }));
             app.get('/reviews', (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -160,3 +284,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log('server running', port);
 });
+//# sourceMappingURL=index.js.map

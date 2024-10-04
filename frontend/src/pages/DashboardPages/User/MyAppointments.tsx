@@ -103,15 +103,22 @@ const MyAppointments = () => {
             <TableCell>${totalCost}</TableCell>
             <TableCell colSpan={2} className="text-right">
               {totalCost === 0 ? (
-                  <Button className="bg-gray-600 hover:bg-transparent" disabled>
-                    Proceed to Pay
-                  </Button>
+                <Button className="bg-gray-600 hover:bg-transparent" disabled>
+                  Proceed to Pay
+                </Button>
               ) : (
-                <Link to="payment">
-                  <Button className="bg-rose-100 hover:bg-transparent text-rose-600 hover:bg-rose-600 hover:text-rose-100 rounded-sm border-2 border-rose-600">
-                    Proceed to Pay
-                  </Button>
-                </Link>
+                <div className="flex justify-end gap-2">
+                  <Link to="stripe-payment">
+                    <Button className="bg-purple-100 hover:bg-transparent text-purple-600 hover:bg-purple-600 hover:text-purple-100 rounded-sm border-2 border-purple-600 ">
+                      Pay with stripe
+                    </Button>
+                  </Link>
+                  <Link to="ssl-payment">
+                    <Button className="bg-blue-100 hover:bg-transparent text-blue-600 hover:bg-blue-600 hover:text-blue-100 rounded-sm border-2 border-blue-600 ">
+                      Pay with SSL
+                    </Button>
+                  </Link>
+                </div>
               )}
             </TableCell>
           </TableRow>

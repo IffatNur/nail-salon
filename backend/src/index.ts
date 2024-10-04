@@ -6,7 +6,7 @@ import { JwtPayload } from 'jsonwebtoken';
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const app = express()
 const jwt = require('jsonwebtoken');
-const port = process.env.PORT || 5002
+const port = process.env.PORT || 5000
 dotenv.config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -43,7 +43,7 @@ async function run() {
     const userCollection = client.db('nailSalonDB').collection('users');
     const paymentCollection = client.db('nailSalonDB').collection('payment-history');
 
-    app.post('/jwt', async(req,res) =>{
+    app.post('/jwt', async(req: Request,res:Response) =>{
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'} );
       // console.log(token);
@@ -82,7 +82,8 @@ async function run() {
       next()
     }
 
-    app.post("/create-payment-intent", async(req,res) =>{
+    // STRIPE 
+    app.post("/create-payment-intent", async(req: Request,res:Response) =>{
       const {cost} = req.body;
       const amount = parseInt(cost) * 100
 
@@ -94,7 +95,13 @@ async function run() {
       res.send({clientSecret: paymentIntent.client_secret})
     });
 
-    app.post('/payment-history',verifyToken, async(req, res) =>{
+    // SSLcommerz 
+    app.post('/create-ssl-payment', async(req, res) =>{
+      const details = req.body;
+      res.send('ssl payment')
+    })
+
+    app.post('/payment-history',verifyToken, async(req: Request, res:Response) =>{
       const paymentDetails = req.body;
       console.log(paymentDetails);
       const result = await paymentCollection.insertOne(paymentDetails);
@@ -108,7 +115,7 @@ async function run() {
       res.send({result,deletedAppointments})
     })
 
-    app.get("/payment-history/:id",verifyToken, async(req,res) =>{
+    app.get("/payment-history/:id",verifyToken, async(req: Request,res:Response) =>{
       const email = req.params.id;
       const query = {clientEmail: email};
       const result = await paymentCollection.find(query).toArray();
@@ -132,7 +139,7 @@ async function run() {
       res.send({isAdmin})
     });
 
-    app.get('/admin-stat',verifyToken,verifyAdmin, async(req,res )=>{
+    app.get('/admin-stat',verifyToken,verifyAdmin, async(req: Request,res:Response )=>{
       const users = await userCollection.estimatedDocumentCount()
       const services = await servicesCollection.estimatedDocumentCount()
       const appointments = await appointmentCollection.estimatedDocumentCount()
@@ -150,7 +157,7 @@ async function run() {
       res.send({users,services,appointments, revenue})
     })
 
-    app.get('/revenue-stats', verifyToken,verifyAdmin, async(req,res) =>{
+    app.get('/revenue-stats', verifyToken,verifyAdmin, async(req: Request,res:Response) =>{
       const result = await paymentCollection
         .aggregate([
           {
@@ -192,25 +199,25 @@ async function run() {
       res.send(result)
     })
 
-     app.get("/services", async (req, res) => {
+     app.get("/services", async (req: Request, res:Response) => {
        const result = await servicesCollection.find().toArray();
        res.send(result);
      });
 
-     app.get('/services/:id', async(req,res) =>{
+     app.get('/services/:id', async(req: Request,res:Response) =>{
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
       const result = await servicesCollection.findOne(query);
       res.send(result)
      })
 
-    app.post('/addservice', verifyToken, verifyAdmin, async(req,res) =>{
+    app.post('/addservice', verifyToken, verifyAdmin, async(req: Request,res:Response) =>{
       const service = req.body;
       const result = await servicesCollection.insertOne(service);
       res.send(result)
     })
 
-    app.delete('/service/:id',verifyToken, verifyAdmin, async(req,res) =>{
+    app.delete('/service/:id',verifyToken, verifyAdmin, async(req: Request,res:Response) =>{
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
       const result = await servicesCollection.deleteOne(query);
@@ -219,7 +226,7 @@ async function run() {
 
     // PENDING UPDATE SERVICE
 
-    // app.patch('/service/:id',verifyToken,verifyAdmin, async(req,res) =>{
+    // app.patch('/service/:id',verifyToken,verifyAdmin, async(req: Request,res:Response) =>{
     //   const update = req.body;
     //   const id = req.params.id;
     //   console.log(id,update);
@@ -240,14 +247,14 @@ async function run() {
       res.send(result)
     })
 
-    app.delete("/users/:id", verifyToken, verifyAdmin, async (req, res) => {
+    app.delete("/users/:id", verifyToken, verifyAdmin, async (req: Request, res:Response) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await userCollection.deleteOne(query);
       res.send(result);
     });
 
-    app.patch("/users/:id", verifyToken, verifyAdmin, async (req, res) => {
+    app.patch("/users/:id", verifyToken, verifyAdmin, async (req: Request, res:Response) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -260,7 +267,7 @@ async function run() {
       res.send(result);
     });
     
-    app.post('/users', async(req,res) =>{
+    app.post('/users', async(req: Request,res:Response) =>{
       const user = req.body;
       const query = {email: user.email}
       const userExists = await userCollection.findOne(query);
@@ -271,19 +278,19 @@ async function run() {
       res.send(result)
     })
 
-    app.get('/reviews', async(req,res) =>{
+    app.get('/reviews', async(req: Request,res:Response) =>{
       const result = await reviewsCollection.find().toArray();
       res.send(result)
     })
 
-    app.get('/appointments',async(req,res) =>{
+    app.get('/appointments',async(req: Request,res:Response) =>{
       const email = req.query.email;
       const query = {email: email}
       const result = await appointmentCollection.find(query).toArray();
       res.send(result)
     })
 
-    app.post('/appointments', async(req,res) =>{
+    app.post('/appointments', async(req: Request,res:Response) =>{
       const appointmentDetails = req.body;
       if(appointmentDetails.email){
         const result = await appointmentCollection.insertOne(appointmentDetails)
@@ -291,7 +298,7 @@ async function run() {
       }
     })
 
-    app.delete('/appointments/:id',async(req,res) => {
+    app.delete('/appointments/:id',async(req: Request,res:Response) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
       const result = await appointmentCollection.deleteOne(query);
@@ -304,7 +311,7 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/', (req,res )=>{
+app.get('/', (req: Request,res:Response )=>{
     res.send('Server is running');
 })
 app.listen(port, () =>{

@@ -17,11 +17,12 @@ import ManageServices from "@/pages/DashboardPages/Admin/ManageServices";
 import UpdateService from "@/pages/DashboardPages/Admin/UpdateService";
 import MyAppointments from "@/pages/DashboardPages/User/MyAppointments";
 import AllUsers from "@/pages/DashboardPages/Admin/AllUsers";
-import Payment from "@/pages/DashboardPages/Payment/Payment";
+import Payment from "@/pages/DashboardPages/StripePayment/Payment";
 import Dashboard from "@/pages/DashboardPages/Dashboard";
 import PaymentHistory from "@/pages/DashboardPages/User/PaymentHistory";
 import UserDashboard from "@/pages/DashboardPages/User/UserDashboard";
 import AdminDashboard from "@/pages/DashboardPages/Admin/AdminDashboard";
+import SSLPayment from "@/pages/DashboardPages/SSLPayment/SSLPayment";
 
 export const router = createBrowserRouter([
   {
@@ -87,10 +88,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "appointment/payment",
+        path: "appointment/stripe-payment",
         element: (
           <PrivateRoute>
             <Payment></Payment>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "appointment/ssl-payment",
+        element: (
+          <PrivateRoute>
+            <SSLPayment></SSLPayment>
           </PrivateRoute>
         ),
       },
@@ -150,7 +159,7 @@ export const router = createBrowserRouter([
           </AdminRoute>
         ),
         loader: async ({ params }) =>
-          fetch(`http://localhost:5002/services/${params.id}`),
+          fetch(`https://nailsalon-backend.vercel.app/services/${params.id}`),
       },
       // {
       //   path: "manageappointments",
